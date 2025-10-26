@@ -14,9 +14,7 @@ __pycache__/
 .idea/
 
 # local data & artifacts
-data/
 !data/README.md        # keep a placeholder
-outputs/
 cache/
 logs/
 wandb/
