@@ -1,0 +1,7 @@
+torch
+transformers==4.57.1
+datasets
+evaluate
+peft
+bitsandbytes
+numpy

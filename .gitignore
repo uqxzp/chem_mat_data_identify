@@ -1,0 +1,31 @@
+# venv & caches
+.venv/
+.env
+.env.* 
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# local data & artifacts
+data/
+!data/README.md        # keep a placeholder
+outputs/
+cache/
+logs/
+wandb/
+
+# model weights / large binaries
+*.safetensors
+*.bin
+*.pt
+*.onnx
+
+# misc
+.DS_Store
