@@ -1,4 +1,4 @@
-Probabilistic binary classifier (title + abstract -> has dataset or not) using TinyLlama + QLoRA.
+Binary classifier (title + abstract -> has dataset or not) using TinyLlama + QLoRA.
 
 No dependencies on ChemMatData, can be easily merged later.
 
@@ -19,7 +19,7 @@ python src/train_classifier.py \
   --optim paged_adamw_8bit
 ```
 
-Evaluate (10 positives + 10 negatives)
+Evaluate on test set (10 positives and negatives each)
 
 ```
 python src/eval_on_test.py \
@@ -28,6 +28,5 @@ python src/eval_on_test.py \
   --max_length 224 \
   --batch_size 1 \
   --use_4bit \
-  --threshold 0.20 \
   --pred_out outputs/preds.jsonl
 ```
