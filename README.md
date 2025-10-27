@@ -1,8 +1,14 @@
 Binary classifier (title + abstract -> has dataset or not) using TinyLlama + QLoRA.
 
-No dependencies on ChemMatData, can be easily merged later.
+No dependencies on ChemMatData, can be transferred later.
 
-Train (low VRAM):
+Predict with title:
+
+```
+python -m src.predict_by_title --model_dir outputs/r5_r8_qkvo_len224
+```
+
+Train (low VRAM settings):
 
 ```
 python src/train_classifier.py \
