@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dataset-release-classifier"
+version = "0.1.0"
+description = "Training, evaluation, and inference tools for identifying papers that release datasets."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.1",
+    "transformers>=4.46.0,<5",
+    "datasets>=2.15",
+    "evaluate>=0.4",
+    "numpy>=1.24",
+    "peft>=0.10",
+    "bitsandbytes>=0.43; platform_system == 'Linux'",
+    "pandas>=2.1",
+    "matplotlib>=3.8",
+    "requests>=2.31",
+    "urllib3>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.3",
+    "ruff>=0.4",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["outputs", "data", "outputs.*", "data.*", "tests", "tests.*"]

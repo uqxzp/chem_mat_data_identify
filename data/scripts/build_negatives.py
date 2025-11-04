@@ -1,124 +1,158 @@
-import argparse, json, os, re, sys, unicodedata
+import argparse
+import json
+import re
+import sys
 from pathlib import Path
-from typing import Dict, List, Set
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
-from data.scripts.fetch_openalex import (
-    iter_random_works_in_chem_and_mat,
-    search_works_hard_negative_candidates,
-)
+from utils.fetch_openalex import (norm_str, search_hard_negatives_chem_and_mat,
+                                  search_random_negatives_chem_and_mat)
+
+# Example usage: PYTHONPATH=. python data/scripts/build_negatives.py   --positives_jsonl data/positives.jsonl   --outfile data/negatives.jsonl
+
+YEAR_LOWER_BOUND = 2010
 
 # terms indicating hard negatives
 HARD_NEGATIVE_TERMS = [
-    "dataset", "data set", "database", "benchmark", "corpus", "collection",
-    "screening", "high-throughput", "high throughput", "hte", "combinatorial",
-    "large-scale", "library", "big data", "data mining",
+    "dataset",
+    "data set",
+    "database",
+    "benchmark",
+    "corpus",
+    "collection",
+    "screening",
+    "high-throughput",
+    "high throughput",
+    "hte",
+    "combinatorial",
+    "large-scale",
+    "library",
+    "big data",
+    "data mining",
 ]
 
 # phrases implying real data release; exclude from negatives
 RELEASE_HINTS = [
-    "we release", "we present a dataset", "we introduce a dataset",
-    "we publish a dataset", "we make.*dataset.*available",
-    "data available at", "available at", "available on",
-    "github.com", "gitlab.com", "figshare", "zenodo", "osf.io",
-    "data repository", "supplementary dataset", "downloadable dataset",
-    "data record", "dataset.*doi", "https://doi.org/",
+    "we release",
+    "we present a dataset",
+    "we introduce a dataset",
+    "we publish a dataset",
+    "we make.*dataset.*available",
+    "available at",
+    "available on",
+    "github.com",
+    "gitlab.com",
+    "figshare",
+    "zenodo",
+    "osf.io",
+    "data repository",
+    "supplementary dataset",
+    "downloadable dataset",
+    "data record",
+    "dataset.*doi",
+    "https://doi.org/",
 ]
 RE_RELEASE = re.compile("|".join(RELEASE_HINTS), flags=re.IGNORECASE)
 
-def _norm_title(t: str) -> str:
-    t = unicodedata.normalize("NFKC", t or "").strip().lower()
-    return re.sub(r"\s+", " ", t)
 
-def _load_positive_titles(p: Path) -> Set[str]:
-    if not p.exists():
-        return set()
-    titles: Set[str] = set()
-    with p.open("r", encoding="utf-8") as f:
+def load_positive_titles(p: Path) -> set[str]:
+    titles: set[str] = set()
+    with p.open(encoding="utf-8") as f:
         for line in f:
-            try:
-                obj = json.loads(line)
-            except Exception:
+            if not line.strip():
                 continue
-            titles.add(_norm_title(obj.get("title", "")))
+            try:
+                title = json.loads(line).get("title")
+            except json.JSONDecodeError:
+                continue
+            t = norm_str(title)
+            if t:
+                titles.add(t)
     return titles
 
-def _looks_like_release(text: str) -> bool:
+
+def likely_release(text: str) -> bool:
     return bool(text and RE_RELEASE.search(text))
 
-def _minimal_record(rec: Dict, hard: bool) -> Dict:
+
+def to_negative_record(rec: dict, hard: int) -> dict:
     return {
-        "title": rec.get("title", "") or "",
-        "abstract": rec.get("abstract", "") or "",
+        "title": rec.get("title"),
+        "abstract": rec.get("abstract"),
         "label": 0,
         "hard_negative": hard,
     }
 
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--positives_jsonl", type=Path, required=True)  # for title de-dupe
+    ap.add_argument("--positives_jsonl", type=Path, required=True)
     ap.add_argument("--outfile", type=Path, required=True)
-    ap.add_argument("--mailto", type=str, default=os.environ.get("OPENALEX_MAILTO"))
-    ap.add_argument("--random_n", type=int, default=200)
-    ap.add_argument("--hard_n", type=int, default=200)
-    ap.add_argument("--seed", type=int, default=123)
-    ap.add_argument("--year_from", type=int, default=2000)
+    ap.add_argument("--random_n", type=int, default=250)
+    ap.add_argument("--hard_n", type=int, default=250)
+    ap.add_argument("--seed", type=int, default=42)
     args = ap.parse_args()
 
-    pos_titles = _load_positive_titles(args.positives_jsonl)
+    positive_titles = load_positive_titles(args.positives_jsonl)
+
+    seen_titles: set[str] = set()
 
     # random negatives
-    random_negs: List[Dict] = []
-    for rec in iter_random_works_in_chem_and_mat(
-        sample_size=args.random_n * 2,  # small oversample for filtering
+    random_negatives: list[dict] = []
+    random_candidates = search_random_negatives_chem_and_mat(
+        sample_size=args.random_n * 2,  # oversample for filtering
         seed=args.seed,
-        year_lower_bound=args.year_from,
-        mailto=args.mailto,
-    ):
+        year_lower_bound=YEAR_LOWER_BOUND,
+    )
+
+    for rec in random_candidates:
         title = rec.get("title")
+        normalized_title = norm_str(title)
+
         if not title:
             continue
-        if _norm_title(title) in pos_titles:
+        if normalized_title in positive_titles or normalized_title in seen_titles:
             continue
-        text = f'{rec.get("title","")} {rec.get("abstract","")}'
-        if _looks_like_release(text):
+        if likely_release(rec.get("abstract")):
             continue
-        random_negs.append(_minimal_record(rec, hard=False))
-        if len(random_negs) >= args.random_n:
+        random_negatives.append(to_negative_record(rec, 0))
+        seen_titles.add(normalized_title)
+
+        if len(random_negatives) >= args.random_n:
             break
 
     # hard negatives
-    hard_candidates = search_works_hard_negative_candidates(
+    hard_negatives: list[dict] = []
+    hard_candidates = search_hard_negatives_chem_and_mat(
         HARD_NEGATIVE_TERMS,
-        limit=args.hard_n * 3,  # small oversample for filtering
-        mailto=args.mailto,
-        year_lower_bound=args.year_from,
+        limit=args.hard_n * 2,  # oversample for filtering
+        year_lower_bound=YEAR_LOWER_BOUND,
     )
-    hard_negs: List[Dict] = []
-    seen = { _norm_title(x["title"]) for x in random_negs }
+
     for rec in hard_candidates:
         title = rec.get("title")
+        normalized_title = norm_str(title)
+
         if not title:
             continue
-        nt = _norm_title(title)
-        if nt in pos_titles or nt in seen:
+        if normalized_title in positive_titles or normalized_title in seen_titles:
             continue
-        text = f'{rec.get("title","")} {rec.get("abstract","")}'
-        if _looks_like_release(text):
+        if likely_release(rec.get("abstract")):
             continue
-        hard_negs.append(_minimal_record(rec, hard=True))
-        seen.add(nt)
-        if len(hard_negs) >= args.hard_n:
+        hard_negatives.append(to_negative_record(rec, 1))
+        seen_titles.add(normalized_title)
+
+        if len(hard_negatives) >= args.hard_n:
             break
 
     # write
     args.outfile.parent.mkdir(parents=True, exist_ok=True)
     with args.outfile.open("w", encoding="utf-8") as out:
-        for ex in random_negs + hard_negs:
-            out.write(json.dumps(ex, ensure_ascii=False) + "\n")
+        for line in random_negatives + hard_negatives:
+            out.write(json.dumps(line, ensure_ascii=False) + "\n")
 
-    print(f"{len(random_negs)+len(hard_negs)} negatives → {args.outfile}")
-    print(f"  random={len(random_negs)}  hard={len(hard_negs)}")
+    print(f"Random: {len(random_negatives)}, Hard: {len(hard_negatives)}")
+
 
 if __name__ == "__main__":
     main()

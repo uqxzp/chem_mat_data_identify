@@ -18,6 +18,9 @@ __pycache__/
 cache/
 logs/
 wandb/
+outputs/
+data/potential_positives.jsonl
+data/scripts/verify_negatives.py
 
 # model weights / large binaries
 *.safetensors
