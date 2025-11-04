@@ -20,6 +20,7 @@ logs/
 wandb/
 outputs/
 data/potential_positives.jsonl
+data/various_formats.txt
 data/scripts/verify_negatives.py
 
 # model weights / large binaries

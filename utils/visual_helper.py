@@ -17,9 +17,9 @@ def visualize_predictions(path: str) -> None:
         cmap="bwr",
         edgecolor="k",
     )
-    plt.xlabel("Sample index")
-    plt.ylabel("Predicted probability")
-    plt.title("Predictions vs. true labels")
+    plt.xlabel("Sample Index")
+    plt.ylabel("Predicted Score")
+    plt.title("Predictions vs. True Labels")
     legend_elements = [
         Line2D(
             [0],
