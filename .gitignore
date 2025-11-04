@@ -28,5 +28,37 @@ data/scripts/verify_negatives.py
 *.pt
 *.onnx
 
+# published classifier artifacts
+!outputs/
+outputs/*
+!outputs/classifier_448/
+outputs/classifier_448/*
+!outputs/classifier_448/README.md
+!outputs/classifier_448/adapter_config.json
+!outputs/classifier_448/adapter_model.safetensors
+!outputs/classifier_448/chat_template.jinja
+!outputs/classifier_448/metrics.json
+!outputs/classifier_448/special_tokens_map.json
+!outputs/classifier_448/test_predictions.jsonl
+!outputs/classifier_448/tokenizer.json
+!outputs/classifier_448/tokenizer_config.json
+!outputs/classifier_448/training_args.bin
+# retain final checkpoint for training resume
+outputs/classifier_448/checkpoint-976/
+!outputs/classifier_448/checkpoint-976/
+outputs/classifier_448/checkpoint-976/*
+!outputs/classifier_448/checkpoint-976/adapter_config.json
+!outputs/classifier_448/checkpoint-976/adapter_model.safetensors
+!outputs/classifier_448/checkpoint-976/chat_template.jinja
+!outputs/classifier_448/checkpoint-976/optimizer.pt
+!outputs/classifier_448/checkpoint-976/README.md
+!outputs/classifier_448/checkpoint-976/rng_state.pth
+!outputs/classifier_448/checkpoint-976/scheduler.pt
+!outputs/classifier_448/checkpoint-976/special_tokens_map.json
+!outputs/classifier_448/checkpoint-976/tokenizer.json
+!outputs/classifier_448/checkpoint-976/tokenizer_config.json
+!outputs/classifier_448/checkpoint-976/trainer_state.json
+!outputs/classifier_448/checkpoint-976/training_args.bin
+
 # misc
 .DS_Store
