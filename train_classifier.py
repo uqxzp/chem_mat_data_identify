@@ -7,7 +7,7 @@ import evaluate
 import numpy as np
 import torch
 from datasets import Dataset, DatasetDict
-from peft import LoraConfig, TaskType, get_peft_model
+from peft import LoraConfig, PeftModel, TaskType, get_peft_model
 from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           BitsAndBytesConfig, DataCollatorWithPadding, Trainer,
                           TrainingArguments, set_seed)
@@ -19,6 +19,17 @@ PROMPT_TEMPLATE = (
     "You are a classifier. Decide if the following paper releases a dataset.\n"
     "Title: {title}\n\nAbstract: {abstract}\nAnswer:"
 )
+
+"""
+Continue training
+
+PYTHONPATH=. python train_classifier.py \
+  --model_name TinyLlama/TinyLlama-1.1B-Chat-v1.0 \
+  --outdir outputs/classifier_512 \
+  --resume_from outputs/classifier_512 \
+  --resume_checkpoint outputs/classifier_512/checkpoint-XXXX \
+  --epochs 10   # Total, not additional epochs
+"""
 
 
 def prepare_dataset(samples: list[dict]) -> Dataset:
@@ -38,15 +49,25 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--outdir", default="outputs/classifier_512")
     parser.add_argument("--model_name", default="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+    parser.add_argument(
+        "--resume_from",
+        default=None,
+        help="Path to existing adapter weights to continue training from.",
+    )
+    parser.add_argument(
+        "--resume_checkpoint",
+        default=None,
+        help="Trainer checkpoint directory to resume optimizer/scheduler state.",
+    )
     parser.add_argument("--max_length", type=int, default=512)
-    parser.add_argument("--epochs", type=int, default=10)
+    parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--val_pos", type=int, default=10)
     parser.add_argument("--val_neg", type=int, default=40)
     parser.add_argument("--test_pos", type=int, default=10)
     parser.add_argument("--test_neg", type=int, default=40)
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--seed", type=int, default=1234)
     args = parser.parse_args()
 
     os.makedirs(args.outdir, exist_ok=True)
@@ -76,7 +97,7 @@ def main():
         remove_columns=["text"],
     )
 
-    model: torch.nn.Module = AutoModelForSequenceClassification.from_pretrained(
+    base_model: torch.nn.Module = AutoModelForSequenceClassification.from_pretrained(
         args.model_name,
         num_labels=2,
         quantization_config=BitsAndBytesConfig(
@@ -88,8 +109,8 @@ def main():
         device_map="auto",
     )
 
-    if hasattr(model.config, "use_cache"):
-        model.config.use_cache = False
+    if hasattr(base_model.config, "use_cache"):
+        base_model.config.use_cache = False
 
     lora_cfg = LoraConfig(
         task_type=TaskType.SEQ_CLS,
@@ -100,8 +121,14 @@ def main():
         bias="none",
         modules_to_save=["score"],
     )
-    model = get_peft_model(model, lora_cfg)
-    print("LoRA adapters active")
+    if args.resume_from:
+        model = PeftModel.from_pretrained(
+            base_model, args.resume_from, is_trainable=True
+        )
+        print(f"Loaded adapters from {args.resume_from}")
+    else:
+        model = get_peft_model(base_model, lora_cfg)
+        print("LoRA adapters active")
 
     """
     # print number of trainable parameters
@@ -126,7 +153,7 @@ def main():
         gradient_accumulation_steps=4,
         eval_strategy="epoch",
         save_strategy="epoch",
-        logging_steps=100,
+        logging_steps=50,
         report_to="none",
         lr_scheduler_type="cosine",
     )
@@ -149,7 +176,7 @@ def main():
         compute_metrics=compute_metrics,
     )
 
-    trainer.train()
+    trainer.train(resume_from_checkpoint=args.resume_checkpoint)
     metrics = trainer.evaluate()
 
     predictions = trainer.predict(tokenized["test"])

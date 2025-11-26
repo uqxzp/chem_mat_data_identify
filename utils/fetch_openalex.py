@@ -36,7 +36,7 @@ def fetch(
         except RequestException:
             return None
 
-        return res if res.ok else None
+        return res
 
 
 def reconstruct_abstract(inv_idx: dict | None) -> str:

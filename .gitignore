@@ -22,6 +22,8 @@ outputs/
 data/potential_positives.jsonl
 data/various_formats.txt
 data/scripts/verify_negatives.py
+data/archive/
+data/production/
 
 # model weights / large binaries
 *.safetensors

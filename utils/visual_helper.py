@@ -8,7 +8,7 @@ from matplotlib.lines import Line2D
 def visualize_predictions(path: str) -> None:
     df = pd.read_json(path, lines=True, dtype={"label": "int64", "pred": "float64"})
     pred_ys = df["prediction"].to_numpy()
-    true_ys = df["label"].to_numpy()
+    true_ys = df.get("label", pd.Series(-1, index=df.index)).to_numpy()
 
     plt.scatter(
         range(len(true_ys)),
