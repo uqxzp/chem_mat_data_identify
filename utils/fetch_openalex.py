@@ -1,14 +1,19 @@
 from __future__ import annotations
 
+import time
 import unicodedata
 from difflib import SequenceMatcher
 from random import Random
-from typing import Iterator
+from typing import Any, Iterator, Optional
 
+import requests
 from requests import RequestException, Response, Session
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
+SESSION = requests.Session()
+
+BASE_URL = "https://api.openalex.org/works"
 OA_BASE = "https://api.openalex.org"
 
 
@@ -159,7 +164,11 @@ def search_hard_negatives_chem_and_mat(
             if not r or r.status_code != 200:
                 break
 
-            for obj in r.json().get("results", ()):
+            items = r.json().get("results", ())
+            if not items:
+                break
+
+            for obj in items:
                 oid = obj.get("id")
                 if not oid or oid in seen:
                     continue
@@ -191,3 +200,91 @@ def fetch_by_title(title: str) -> dict | None:
         "title": obj.get("title") or obj.get("display_name") or "",
         "abstract": reconstruct_abstract(obj.get("abstract_inverted_index")),
     }
+
+
+def search_openalex(
+    search_query: str,
+    concepts: Optional[list[str]] = None,
+    per_page: int = 200,
+    max_pages: int = 10,
+    retries: int = 3,
+    backoff_factor: float = 0.5,
+) -> list[dict[str, Any]]:
+    """
+    Searches OpenAlex with pagination, retries, and concept filtering.
+
+    Args:
+        search_query: The search query string for title/abstract.
+        concepts: A list of OpenAlex concept IDs to filter by.
+        per_page: Number of results per page.
+        max_pages: Maximum number of pages to fetch.
+        retries: Number of retries for a request.
+        backoff_factor: Factor for exponential backoff on retries.
+
+    Returns:
+        A list of work items from OpenAlex.
+    """
+    all_items = []
+
+    # Construct filter string
+    filters = []
+    if concepts:
+        concept_filter = "|".join(concepts)
+        filters.append(f"concepts.id:{concept_filter}")
+
+    # Add other useful filters
+    filters.append("has_doi:true")
+    filters.append("type:article")
+
+    filter_string = ",".join(filters)
+
+    print(
+        f"INFO: Starting search with query='{search_query}' and filter='{filter_string}'"
+    )
+
+    for page in range(1, max_pages + 1):
+        params = {
+            "filter": filter_string,
+            "search": search_query,
+            "per_page": per_page,
+            "page": page,
+        }
+
+        for attempt in range(retries):
+            try:
+                response = SESSION.get(BASE_URL, params=params)
+                response.raise_for_status()  # Raises HTTPError for bad responses (4XX or 5XX)
+
+                data = response.json()
+                items = data.get("results", [])
+
+                if not items:
+                    print(
+                        f"INFO: No more items found on page {page}. Concluding search."
+                    )
+                    return all_items
+
+                all_items.extend(items)
+                print(
+                    f"INFO: Fetched page {page}, total items so far: {len(all_items)}"
+                )
+
+                # Success, break the retry loop
+                break
+
+            except requests.exceptions.RequestException as e:
+                print(
+                    f"WARN: Request failed on page {page}, attempt {attempt + 1}/{retries}: {e}"
+                )
+                if attempt + 1 == retries:
+                    print(f"ERROR: Max retries reached for page {page}. Skipping.")
+                    return all_items  # Return what we have so far
+                time.sleep(backoff_factor * (2**attempt))  # Exponential backoff
+
+        # Small delay to be polite to the API
+        time.sleep(0.1)
+
+    print(
+        f"INFO: Reached max pages ({max_pages}). Total items fetched: {len(all_items)}"
+    )
+    return all_items

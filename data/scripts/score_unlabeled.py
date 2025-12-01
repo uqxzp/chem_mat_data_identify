@@ -15,9 +15,9 @@ from utils.visual_helper import visualize_predictions
 """
 PYTHONPATH=. python data/scripts/score_unlabeled.py \
   --model_dir outputs/classifier_512_v3_2/checkpoint-1104 \
-  --jsonl data/production/unlabeled_openalex.jsonl \
-  --output_all data/production/scored_all.jsonl \
-  --output_flagged data/production/scored_flagged.jsonl \
+  --jsonl data/production/potential_positives.jsonl \
+  --output_all data/production/scored_pp_all.jsonl \
+  --output_flagged data/production/scored_pp_flagged.jsonl \
   --threshold 0.05 \
   --max_length 512
 """

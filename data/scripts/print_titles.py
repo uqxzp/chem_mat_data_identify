@@ -15,9 +15,10 @@ def load_titles(path: Path) -> list[str]:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--jsonl", type=Path, default=Path("data/production/scored_flagged.jsonl"))
+    parser.add_argument("--jsonl", type=Path, default=Path("data/production/scored_pp_flagged.jsonl"))
     parser.add_argument("--dedup", type=Path, default=Path("data/positives.jsonl"))
-    parser.add_argument("--batch_size", type=int, default=0)
+    parser.add_argument("--batch_size", type=int, default=4)
+    parser.add_argument("--limit", type=int, default=100)
     args = parser.parse_args()
 
     to_print = load_titles(args.jsonl)
@@ -29,6 +30,8 @@ def main():
         print(f"{i}: {t}")
         if args.batch_size > 1 and i % args.batch_size == 0:
             print()
+        if i >= args.limit:
+            break
 
 
 if __name__ == "__main__":
