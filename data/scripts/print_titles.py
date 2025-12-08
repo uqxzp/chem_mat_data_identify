@@ -19,6 +19,7 @@ def main():
     parser.add_argument("--dedup", type=Path, default=Path("data/positives.jsonl"))
     parser.add_argument("--batch_size", type=int, default=4)
     parser.add_argument("--limit", type=int, default=100)
+    parser.add_argument("--offset", type=int, default=0)
     args = parser.parse_args()
 
     to_print = load_titles(args.jsonl)
@@ -26,13 +27,14 @@ def main():
         dedup = load_titles(args.dedup)
         to_print = [t for t in to_print if t not in dedup]
 
-    for i, t in enumerate(to_print, start=1):
-        print(f"{i}: {t}")
+    selection = to_print[args.offset : args.offset + args.limit]
+
+    for i, t in enumerate(selection, start=args.offset + 1):
+        print(f"{t}")#print(f"{i}: {t}")
+
         if args.batch_size > 1 and i % args.batch_size == 0:
             print()
-        if i >= args.limit:
-            break
-
+    
 
 if __name__ == "__main__":
     main()

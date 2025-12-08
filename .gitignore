@@ -23,7 +23,8 @@ data/potential_positives.jsonl
 data/various_formats.txt
 data/scripts/verify_negatives.py
 data/archive/
-data/production/
+data/production/*
+!data/production/fetch_oa_in_order.py
 
 # model weights / large binaries
 *.safetensors

@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import subprocess
 from pathlib import Path
 
 import torch
@@ -13,13 +14,11 @@ from train_classifier import PROMPT_TEMPLATE
 from utils.visual_helper import visualize_predictions
 
 """
-PYTHONPATH=. python data/scripts/score_unlabeled.py \
-  --model_dir outputs/classifier_512_v3_2/checkpoint-1104 \
-  --jsonl data/production/potential_positives.jsonl \
-  --output_all data/production/scored_pp_all.jsonl \
-  --output_flagged data/production/scored_pp_flagged.jsonl \
-  --threshold 0.05 \
-  --max_length 512
+PYTHONPATH=. python data/scripts/score_samples.py \
+  --model_dir outputs/classifier_512_v4 \
+  --jsonl data/production/unlabeled_openalex.jsonl \
+  --output_all data/production/scored_all.jsonl \
+  --output_flagged data/production/scored_flagged.jsonl \
 """
 
 LOAD_KWARGS = {
@@ -102,9 +101,14 @@ def main():
     parser.add_argument(
         "--output_flagged", type=Path, default=Path("data/scored_flagged.jsonl")
     )
-    parser.add_argument("--threshold", type=float, default=0.1)
+    parser.add_argument("--threshold", type=float, default=0.05)
     parser.add_argument("--max_length", type=int, default=512)
     parser.add_argument("--print_real_time", type=bool, default=True)
+    parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="run dataset_verification.py on flagged samples",
+    )
     args = parser.parse_args()
 
     tokenizer = AutoTokenizer.from_pretrained(args.model_dir)
@@ -149,6 +153,14 @@ def main():
 
     sort_jsonl(args.output_flagged)
     visualize_predictions(args.output_all)
+
+    if args.verify:
+        repo_root = Path(__file__).resolve().parent.parent
+        subprocess.run(
+            ["python", "opencode/dataset_verification.py"],
+            check=True,
+            cwd=repo_root,
+        )
 
 
 if __name__ == "__main__":

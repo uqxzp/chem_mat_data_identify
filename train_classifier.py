@@ -21,6 +21,11 @@ PROMPT_TEMPLATE = (
 )
 
 """
+Start new training
+
+PYTHONPATH=. python train_classifier.py \
+  --outdir outputs/classifier_512_v4 \
+
 Continue training
 
 PYTHONPATH=. python train_classifier.py \
