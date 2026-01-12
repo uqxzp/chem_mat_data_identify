@@ -9,40 +9,46 @@ from opencode_client import send_message
 
 DEFAULT_FLAGGED = Path("data/production/scored_flagged.jsonl")
 
-# TODO: discuss acceptable and unacceptable format (SMILES, InChI, SELFIES, 3D Coordinate files (XYZ, SDF, MOL, PDB, CIF))
+# Externalize logic to force thorough research
+# Includes PDB and CIF; they will be sorted out in the processing part
+DATA_VERIFICATION_PROMPT = """
+You are an expert Data Curator for Chemistry and Material Science. Your goal is to assess scientific papers to determine if they release new or newly curated datasets suitable for training Graph Neural Networks (GNNs).
 
-DATASET_CURATION_PROMPT = """
-You are an expert Data Curator for Chemistry and Material Science. Your goal is to assess scientific papers to determine if they release datasets suitable for training Graph Neural Networks (GNNs).
+Mandatory Research Protocol: To ensure high accuracy, you must follow a Chain-of-Verification process. For every paper, you must physically "locate" the data evidence. Do not provide a verdict based on the title alone.
 
-I will provide a batch of 4 paper titles. For each title, perform the following steps:
+I will provide batches of 4 paper titles. For each title, perform these exact steps:
 
-STEP 1: Identification
-Identify the specific publication. The input titles are generally correct but may contain minor spelling errors.
-- If you find the paper: Use the correct, full title in your output.
-- If you absolutely cannot match the title to a real publication: Output "Publication not found" and stop for that entry.
+STEP 1: Identification & Search Trail
+- Identify the specific publication.
+- Search Trail (Output this!): Briefly state where you looked (e.g., "Checked Supporting Info for DOI: 10.1021/...", "Searched author's GitHub repository").
 
 STEP 2: Dataset Verification (Strict Criteria)
-Analyze if the paper releases a molecular dataset. I am EXCLUSIVELY interested in datasets that provide molecular structures in machine-readable formats.
-- Acceptable formats (Verdict: Yes): SMILES or 3D Coordinate files (XYZ)
-- Unacceptable formats (Verdict: No): Datasets that are only images, PDF tables, pure text descriptions, or spectral data without accompanying structures.
-- No dataset (Verdict: No): Papers that discuss theory or synthesis without releasing a structured dataset.
+- Primary Check: Does the paper contribute its own structured data (e.g., new experiments or QM calculations)?
+- Format Check: Data must be in SMILES, InChI, SELFIES, or 3D formats (XYZ, SDF, MOL, PDB, CIF).
+- Exclusion Rule: If the paper only uses existing datasets without a newly curated version, the verdict is NO.
+- Evidence Requirement: If the verdict is "Yes", you must find the Accession ID, DOI, or a direct repository (e.g., GitHub, Figshare) link. If you cannot find a link/ID, you must mark it "No" or "Unsure."
 
-Rules for Verdicts:
-1. YES: Only if a dataset is explicitly mentioned (e.g., in Supporting Information, GitHub, Zenodo, or a database). You MUST append the specific format found (e.g., "Yes, SMILES" or "Yes, XYZ").
-2. NO: If no dataset exists, or if the dataset is not in the acceptable formats listed above.
-3. UNSURE: This verdict is highly discouraged. Use this only if the paper seemingly claims a dataset exists but the format is ambiguous even after analysis.
+STEP 3: The Verdict Policy
+- YES: Only if a new/curated dataset is explicitly released. Append the format (e.g., "Yes, SMILES").
+- NO: If no dataset is released or it is in an unacceptable format (PDF only, images, etc.).
+- UNSURE (Discouraged): This verdict is a last resort. If you use it, you must provide a detailed justification explaining why the data status is ambiguous despite a deep dive. "I don't know" is not an acceptable justification.
 
-STEP 3: Output Formatting
-You must strictly follow this format for every entry. Do not add conversational filler.
+STEP 4: Strict Output Formatting You must strictly follow this format for every entry:
+Input: <Exact user title> 
+Best match: <Full Paper Title> 
+Search Trail: <1-2 sentences describing where the data was verified> 
+Evidence: <Link, DOI, or "None found"> 
+Verdict: <Yes [Format] / No / Unsure> 
+[Only if Unsure] Justification: <Detailed reason for uncertainty>
 
-Input: <Exact input title provided by user>
-Best match: <Corrected Title of the publication OR "Publication not found">
-Verdict: <Yes, [Format] / No / Unsure>
+Final rule: take your time and research thoroughly. I value a 2-minute accurate response over a 5-second hallucination.
 
 ---
+
 Here is the batch of titles to process:
 {titles}
 """
+
 
 
 def load_titles(path: Path) -> list[str]:
