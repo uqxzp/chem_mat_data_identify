@@ -1,3 +1,10 @@
+Comparison API vs Web UI with same model (GPT 5.2) and same prompt:
+API:    20 Yes (43%), 14 No, 14 Timeout, 1 Invalid output.
+Web UI: 28 Yes (60%), 19 No, 2 Unsure
+Average time per title: 2min (API) vs 30s (Web UI)
+
+-----
+
 # Batch 1 (1 titles)
 Input: Quantum chemical benchmark databases of gold-standard dimer interaction energies  
 Best match: Quantum chemical benchmark databases of gold-standard dimer interaction energies  
