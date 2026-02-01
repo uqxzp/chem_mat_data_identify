@@ -1,0 +1,365 @@
+# Batch 1 (1 titles)
+Input: Quantum chemical benchmark databases of gold-standard dimer interaction energies  
+Best match: Quantum chemical benchmark databases of gold-standard dimer interaction energies  
+Search Trail: Checked the Nature Scientific Data article page for “Data availability” and followed the linked Figshare collection; then verified the actual released files via the Figshare API for DES370K/DES15K/DES5M.  
+Evidence: https://api.figshare.com/v2/articles/12692714 ; https://doi.org/10.6084/m9.figshare.c.5070644.v1  
+Verdict: No
+
+Sending batch 2 with 1 titles...
+# Batch 2 (1 titles)
+Input: QM-symex, update of the QM-sym database with excited state information for 173 kilo molecules  
+Best match: QM-symex, update of the QM-sym database with excited state information for 173 kilo molecules  
+Search Trail: Checked the Scientific Data (Nature) landing page and the PMC full-text for “Data Records” / “Data Availability/Code availability” sections that specify where the dataset is hosted and what file formats are provided. Verified the dataset DOI pointing to Figshare.  
+Evidence: https://doi.org/10.6084/m9.figshare.12815276 (QM-symex database on Figshare); https://doi.org/10.6084/m9.figshare.13089554 (machine-accessible metadata)  
+Verdict: Yes, XYZ
+
+Sending batch 3 with 1 titles...
+Batch 3 failed: timed out
+Skipping to next batch.
+
+Sending batch 4 with 1 titles...
+# Batch 4 (1 titles)
+Input: SPICE, A Dataset of Drug-like Molecules and Peptides for Training Machine Learning Potentials  
+Best match: SPICE, A Dataset of Drug-like Molecules and Peptides for Training Machine Learning Potentials (Scientific Data, 2023) https://doi.org/10.1038/s41597-022-01882-6  
+Search Trail: Checked the Nature Scientific Data article landing page for the definitive paper match/DOI, then verified dataset release details via the `openmm/spice-dataset` GitHub README and the linked Zenodo record (file list + dataset structure/fields).  
+Evidence: https://doi.org/10.5281/zenodo.10975225  
+Verdict: Yes, SMILES + 3D coordinates
+
+Sending batch 5 with 1 titles...
+# Batch 5 (1 titles)
+Input: tmQMg* Dataset: Excited State Properties of 74k Transition Metal Complexes
+Best match: tmQMg* Data Set: Excited State Properties of 74k Transition Metal Complexes
+Search Trail: Checked the PubMed/PMC entry for the exact article and DOI, then followed the “Data and Code” links to Zenodo and the `uiocompcat/tmQMg_star` GitHub repo. Opened the released `tmQMg*.csv` on Zenodo/GitHub to verify whether SMILES/InChI/SELFIES or 3D structure files are included.
+Evidence: https://doi.org/10.5281/zenodo.17209767 ; https://github.com/uiocompcat/tmQMg_star (contains `tmQMg*.csv`)
+Verdict: No
+
+Sending batch 6 with 1 titles...
+Batch 6 failed: timed out
+Skipping to next batch.
+
+Sending batch 7 with 1 titles...
+Batch 7 failed: timed out
+Skipping to next batch.
+
+Sending batch 8 with 1 titles...
+Batch 8 failed: timed out
+Skipping to next batch.
+
+Sending batch 9 with 1 titles...
+# Batch 9 (1 titles)
+Input: Multi-Solvent Graph Neural Network for Reduction Potential Prediction across the Chemical Space  
+Best match: Multi-Solvent Graph Neural Network for Reduction Potential Prediction Across the Chemical Space  
+Search Trail: Checked the PubMed record and the free full text on PubMed Central for the Data Availability / dataset statement, then followed the provided GitHub links and verified the released files (CSV with SMILES + directories of `.xyz` geometries).  
+Evidence: https://github.com/grynova-ccc/ReSolvedDB ; DOI: 10.1021/acs.jcim.5c01450  
+Verdict: Yes, SMILES + XYZ
+
+Sending batch 10 with 1 titles...
+# Batch 10 (1 titles)
+Input: Machine Learning for Organic Cage Property Prediction  
+Best match: Machine Learning for Organic Cage Property Prediction (Chem. Mater. 2019, 31, 3, 714–727)  
+Search Trail: Checked the Imperial College Research Data Repository record linked to the work (DOI `10.14469/hpc/4618`) and the associated GitHub repository `lukasturcani/cage_prediction` README for the actual distributed file types/structure representations; also checked the ACS article page (`10.1021/acs.chemmater.8b03572`) for supporting-information downloads.  
+Evidence: https://doi.org/10.14469/hpc/4618  
+Verdict: No
+
+Sending batch 11 with 1 titles...
+# Batch 11 (1 titles)
+Input: Guided docking as a data generation approach facilitates structure-based machine learning on kinases  
+Best match: Guided Docking as a Data Generation Approach Facilitates Structure-Based Machine Learning on Kinases  
+Search Trail: Crawled the ACS article landing page for DOI `10.1021/acs.jcim.4c00055` (including the Supporting Information section) and followed external data leads to the authors’ dataset deposit; verified the downloadable archive contents on the Zenodo record and cross-checked the associated `volkamerlab/kinodata-3D` GitHub repository README.  
+Evidence: https://doi.org/10.5281/zenodo.10410259 (Zenodo record `10410259`, file `kinodata_3d.zip`); https://github.com/volkamerlab/kinodata-3D  
+Verdict: Yes, SDF (docked ligand poses) + MOL2 (protein pockets)
+
+Sending batch 12 with 1 titles...
+# Batch 12 (1 titles)
+Input: Extending quantum-mechanical benchmark accuracy to biological ligand-pocket interactions  
+Best match: Extending quantum-mechanical benchmark accuracy to biological ligand-pocket interactions (Nature Communications, 2025)  
+Search Trail: Checked the Nature Communications landing page for DOI `10.1038/s41467-025-63587-9` and followed the paper-linked GitHub repository (`MirelaVP/QUID`) to inspect the released data files and their formats.  
+Evidence: https://doi.org/10.1038/s41467-025-63587-9 ; https://github.com/MirelaVP/QUID  
+Verdict: No
+
+Sending batch 13 with 1 titles...
+# Batch 13 (1 titles)
+Input: ΔDFT Predicts Inverted Singlet-Triplet Gaps with Chemical Accuracy at a Fraction of the Cost of Wave Function-Based Approaches  
+Best match: ΔDFT Predicts Inverted Singlet–Triplet Gaps with Chemical Accuracy at a Fraction of the Cost of Wave Function-Based Approaches (J. Phys. Chem. Lett., 2024)  
+Search Trail: Checked the ACS article page for DOI `10.1021/acs.jpclett.4c01649`, then verified the “Supporting Information” section and its downloadable files (especially the SI ZIP described as containing geometries in `.xyz` format).  
+Evidence: DOI `10.1021/acs.jpclett.4c01649`; Supporting-info geometries ZIP: https://pubs.acs.org/doi/suppl/10.1021/acs.jpclett.4c01649/suppl_file/jz4c01649_si_003.zip  
+Verdict: Yes [XYZ]
+
+Sending batch 14 with 1 titles...
+# Batch 14 (1 titles)
+Input: Matrix of orthogonalized atomic orbital coefficients representation for radicals and ions  
+Best match: Matrix of orthogonalized atomic orbital coefficients representation for radicals and ions (J. Chem. Phys. 2023, 158, 214116; doi: 10.1063/5.0151122)  
+Search Trail: Checked PubMed entry `https://pubmed.ncbi.nlm.nih.gov/37265212/` for the definitive journal identification/DOI, then verified dataset release by inspecting the authors’ GitHub support repository and its `Datasets/` subfolders (including the `INFO.info` files describing file formats).  
+Evidence: https://github.com/hits-ccc/MAOC/tree/main/Datasets  
+Verdict: Yes, XYZ
+
+Sending batch 15 with 1 titles...
+# Batch 15 (1 titles)
+Input: A quantitative metric for organic radical stability and persistence using thermodynamic and kinetic features  
+Best match: A quantitative metric for organic radical stability and persistence using thermodynamic and kinetic features  
+Search Trail: Checked the RSC Chemical Science article HTML for the “Data availability” section (DOI: 10.1039/D1SC02770K) and verified the referenced Figshare deposit identifier; also checked the Paton lab `patonlab/RSS` GitHub repo for any additional released data files.  
+Evidence: https://doi.org/10.6084/m9.figshare.14597556.v2  
+Verdict: Yes, SDF
+
+Sending batch 16 with 1 titles...
+# Batch 16 (1 titles)
+Input: Predicting Synthesizability using Machine Learning on Databases of Existing Inorganic Materials  
+Best match: Predicting Synthesizability using Machine Learning on Databases of Existing Inorganic Materials (ACS Omega, 2023)  
+Search Trail: Checked the open full-text on PMC for DOI `10.1021/acsomega.2c04856` (methods/data sources + any “Data Availability”/supplement links), then inspected the paper-linked GitHub repository `RaymondZhurm/SC_model` (especially `data/` and `data/predict_cif/`) for downloadable structure datasets (CIF/XYZ/etc.).  
+Evidence: DOI: https://doi.org/10.1021/acsomega.2c04856 ; GitHub: https://github.com/RaymondZhurm/SC_model  
+Verdict: No
+
+# Counter was reset; continued at paper 17
+
+Sending batch 1 with 1 title(s):
+BigBind: Learning from Nonstructural Data for Structure-Based Virtual Screening
+# Batch 1 (1 titles)
+Input: BigBind: Learning from Nonstructural Data for Structure-Based Virtual Screening  
+Best match: BigBind: Learning from Nonstructural Data for Structure-Based Virtual Screening (J. Chem. Inf. Model., 2024)  
+Search Trail: Checked the official BigBind dataset GitHub (`README.md`) for explicit dataset download links and documented file structure/formats; cross-checked the journal landing page for the canonical DOI.  
+Evidence: https://github.com/molecularmodelinglab/bigbind (direct download: https://storage.googleapis.com/bigbind_data/BigBindV1.5.tar.gz ; paper DOI: https://doi.org/10.1021/acs.jcim.3c01211)  
+Verdict: Yes, SMILES/SDF/PDB
+
+Sending batch 2 with 1 title(s):
+Fast evaluation of the adsorption energy of organic molecules on metals via graph neural networks
+Batch 2 failed: timed out
+Skipping to next batch.
+
+Sending batch 3 with 1 title(s):
+Data-driven and constrained optimization of semi-local exchange and nonlocal correlation functionals for materials and surface chemistry
+Batch 3 failed: timed out
+Skipping to next batch.
+
+Sending batch 4 with 1 title(s):
+Designing solvent systems using self-evolving solubility databases and graph neural networks
+# Batch 4 (1 titles)
+Input: Designing solvent systems using self-evolving solubility databases and graph neural networks  
+Best match: Designing solvent systems using self-evolving solubility databases and graph neural networks (Chem. Sci., 2024)  
+Search Trail: Checked the RSC article page for DOI `10.1039/D3SC03468B`, specifically the “Data availability” section, then followed the linked GitHub repository and opened the released database CSVs (raw view) to confirm they contain canonical SMILES columns.  
+Evidence: https://pubs.rsc.org/en/content/articlehtml/2024/sc/d3sc03468b (DOI: 10.1039/D3SC03468B); https://github.com/BioE-KimLab/Solv_GNN_SSD (e.g., raw Aug-DB CSV with `can_smiles_*`: https://raw.githubusercontent.com/BioE-KimLab/Solv_GNN_SSD/main/data/Aug-DBs/Aug-DB1.csv)  
+Verdict: Yes, SMILES
+
+Sending batch 5 with 1 title(s):
+Predicting Solubility Limits of Organic Solutes for a Wide Range of Solvents and Temperatures
+# Batch 5 (1 titles)
+Input: Predicting Solubility Limits of Organic Solutes for a Wide Range of Solvents and Temperatures  
+Best match: Predicting Solubility Limits of Organic Solutes for a Wide Range of Solvents and Temperatures (J. Am. Chem. Soc. 2022; DOI: 10.1021/jacs.2c01768)  
+Search Trail: Checked the ACS article page (DOI: `10.1021/jacs.2c01768`) and its Supporting Information section for data availability links; followed the ChemRxiv “Supplementary Links” to the SolProp dataset landing page on Zenodo and checked the associated `fhvermei/SolProp_ML` GitHub README for stated chemical identifiers/formats.  
+Evidence: https://zenodo.org/records/5970538 (SolProp dataset release)  
+Verdict: Yes, SMILES/InChI
+
+Sending batch 6 with 1 title(s):
+High-Throughput Screening Approach for the Optoelectronic Properties of Conjugated Polymers
+Batch 6 failed: timed out
+Skipping to next batch.
+
+Sending batch 7 with 1 title(s):
+The ChEMBL Database in 2023: a drug discovery platform spanning multiple bioactivity data types and time periods
+# Batch 7 (1 titles)
+Input: The ChEMBL Database in 2023: a drug discovery platform spanning multiple bioactivity data types and time periods  
+Best match: The ChEMBL Database in 2023: a drug discovery platform spanning multiple bioactivity data types and time periods  
+Search Trail: Checked the PMC full text for DOI `10.1093/nar/gkad1004` (including the section referencing “ChEMBL 33” and its release notes/FTP location), then verified the actual released files in the EMBL-EBI ChEMBL FTP `chembl_33` release directory and the official ChEMBL downloads documentation listing per-release DOIs.  
+Evidence: `https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_33/` (includes `chembl_33.sdf.gz`); ChEMBL release DOI `10.6019/CHEMBL.database.33`  
+Verdict: Yes, SDF
+
+Sending batch 8 with 1 title(s):
+tmQM Dataset—Quantum Geometries and Properties of 86k Transition Metal Complexes
+# Batch 8 (1 titles)
+Input: tmQM Dataset—Quantum Geometries and Properties of 86k Transition Metal Complexes  
+Best match: tmQM Dataset—Quantum Geometries and Properties of 86k Transition Metal Complexes (J. Chem. Inf. Model., 2020), DOI: 10.1021/acs.jcim.0c01041  
+Search Trail: Checked the full-text PMC version for the “Data Availability” statement (DOI: 10.1021/acs.jcim.0c01041) and followed the linked dataset repository. Also cross-checked the UiO Computational Catalysis Group tmQM dataset page for the downloadable file formats.  
+Evidence: https://pmc.ncbi.nlm.nih.gov/articles/PMC7768608/ ; https://github.com/bbskjelstad/tmqm ; DOI: 10.1021/acs.jcim.0c01041  
+Verdict: Yes, XYZ (3D) + SMILES
+
+Sending batch 9 with 1 title(s):
+A database framework for rapid screening of structure-function relationships in PFAS chemistry
+Batch 9 failed: timed out
+Skipping to next batch.
+
+Sending batch 10 with 1 title(s):
+Comprehensive Thermochemical Benchmark Set of Realistic Closed-Shell Metal Organic Reactions
+Batch 10 failed: timed out
+Skipping to next batch.
+
+Sending batch 11 with 1 title(s):
+Mapping binary copolymer property space with neural networks
+# Batch 11 (1 titles)
+Input: Mapping binary copolymer property space with neural networks  
+Best match: Mapping binary copolymer property space with neural networks (Chem. Sci., 2019)  
+Search Trail: Checked the RSC article page for the Electronic Supplementary Information (ESI) data statement for DOI `10.1039/C8SC05710A`, then followed the linked GitHub repository and inspected the raw CSV files for machine-readable structure fields (SMILES).  
+Evidence: `https://pubs.rsc.org/en/content/articlehtml/2019/sc/c8sc05710a` (DOI: `10.1039/C8SC05710A`), dataset repo: `https://github.com/ZwijnenburgGroup/2019-polymer-neural-network` (e.g., raw CSVs `https://github.com/ZwijnenburgGroup/2019-polymer-neural-network/raw/refs/heads/master/training-data.csv`, `https://github.com/ZwijnenburgGroup/2019-polymer-neural-network/raw/refs/heads/master/neural-network-predictions.csv`)  
+Verdict: Yes, SMILES
+
+Sending batch 12 with 1 title(s):
+Real-time prediction of 1H and 13C chemical shifts with DFT accuracy using a 3D graph neural network
+# Batch 12 (1 titles)
+Input: Real-time prediction of 1H and 13C chemical shifts with DFT accuracy using a 3D graph neural network  
+Best match: Real-time prediction of 1H and 13C chemical shifts with DFT accuracy using a 3D graph neural network  
+Search Trail: Checked the open-access full text on PMC for the paper (DOI: 10.1039/D1SC03343C) and followed the “datasets shared openly” trail to the Paton Lab CASCADE GitHub repository, verifying that the `data/` directories contain downloadable structure files. Also checked the Zenodo DOI linked from the CASCADE repository.  
+Evidence: https://github.com/patonlab/CASCADE/tree/master/data (includes `data/DFT8K/DFT.sdf.gz`, `data/Exp5K/DFT.sdf.gz`, etc.); https://doi.org/10.5281/zenodo.3369360  
+Verdict: Yes [SDF]
+
+Sending batch 13 with 1 title(s):
+Using machine learning in QSPR to estimate the boiling and critical temperatures of pure organic compounds
+# Batch 13 (1 titles)
+Input: Using machine learning in QSPR to estimate the boiling and critical temperatures of pure organic compounds  
+Best match: Using machine learning in QSPR to estimate the boiling and critical temperatures of pure organic compounds (Yassine Beghour, Yasmina Lahiouel; Chemical Engineering Science, 2025, Article 121228)  
+Search Trail: Checked the ScienceDirect article page for “Data availability”, “Supplementary material”, and any outbound dataset/repository links; also searched the web for the DOI/PII combined with “dataset”, “Mendeley Data”, “Figshare”, and “GitHub”.  
+Evidence: https://www.sciencedirect.com/science/article/abs/pii/S000925092500051X (DOI: 10.1016/j.ces.2025.121228)  
+Verdict: No
+
+Sending batch 14 with 1 title(s):
+A look at the density functional theory zoo with the advanced GMTKN55 database for general main group thermochemistry, kinetics and noncovalent interactions
+# Batch 14 (1 titles)
+Input: A look at the density functional theory zoo with the advanced GMTKN55 database for general main group thermochemistry, kinetics and noncovalent interactions  
+Best match: A look at the density functional theory zoo with the advanced GMTKN55 database for general main group thermochemistry, kinetics and noncovalent interactions  
+Search Trail: Checked the RSC journal landing page for “Supplementary files” (only a PDF ESI). Followed the paper’s “dedicated website” for GMTKN55 and inspected the provided geometry downloads, which are distributed as `.tar` archives in TURBOMOLE geometry format rather than XYZ/SDF/MOL/PDB/CIF or SMILES/InChI/SELFIES.  
+Evidence: 10.1039/C7CP04913G; https://www.chemie.uni-bonn.de/grimme/de/software/gmtkn/gmtkn55; https://www.rsc.org/suppdata/c7/cp/c7cp04913g/c7cp04913g1.pdf  
+Verdict: No
+
+Sending batch 15 with 1 title(s):
+A look at the density functional theory zoo with the advanced GMTKN55 database for general main group thermochemistry, kinetics and noncovalent interactions
+Batch 15 failed: timed out
+Skipping to next batch.
+
+Sending batch 16 with 1 title(s):
+Assessment of Gaussian-2 and density functional theories for the computation of enthalpies of formation
+Batch 16 failed: timed out
+Skipping to next batch.
+
+Sending batch 17 with 1 title(s):
+Reactive Chemistry at Unrestricted Coupled Cluster Level: High-throughput Calculations for Training Machine Learning Potentials
+# Batch 17 (1 titles)
+Input: Reactive Chemistry at Unrestricted Coupled Cluster Level: High-throughput Calculations for Training Machine Learning Potentials  
+Best match: Reactive Chemistry at Unrestricted Coupled Cluster Level: High-throughput Calculations for Training Machine Learning Potentials (arXiv:2509.10872)  
+Search Trail: Checked the arXiv abstract page and the full experimental HTML for arXiv:2509.10872 (looked for “data availability”, Zenodo/Figshare/OSF/GitHub dataset links). Followed the only explicit external link found (the ALF GitHub repository) to see if the dataset files are hosted there.  
+Evidence: None found (paper links only to code: https://github.com/lanl/ALF ; arXiv DOI: https://doi.org/10.48550/arXiv.2509.10872)  
+Verdict: No
+
+Sending batch 18 with 1 title(s):
+Complexity of many-body interactions in transition metals via machine-learned force fields from the TM23 data set
+Batch 18 failed: timed out
+Skipping to next batch.
+
+Sending batch 19 with 1 title(s):
+Explainable Synthesizability Prediction of Inorganic Crystal Polymorphs using Large Language Models
+# Batch 19 (1 titles)
+Input: Explainable Synthesizability Prediction of Inorganic Crystal Polymorphs using Large Language Models  
+Best match: Explainable Synthesizability Prediction of Inorganic Crystal Polymorphs using Large Language Models (ChemRxiv preprint; DOI: 10.26434/chemrxiv-2024-ltncz-v2)  
+Search Trail: Checked the ChemRxiv record’s “Supplementary Links” for released data/code, then inspected the linked GitHub (`snu-micc/StructLLM`) and its referenced Zenodo dataset record to verify what file formats are actually distributed.  
+Evidence: https://doi.org/10.5281/zenodo.14729225 (file: `descriptions_mp30.zip`); https://github.com/snu-micc/StructLLM  
+Verdict: No
+
+Sending batch 20 with 1 title(s):
+The ChEMBL Database in 2023: a drug discovery platform spanning multiple bioactivity data types and time periods
+Batch 20 failed: timed out
+Skipping to next batch.
+
+Sending batch 21 with 1 title(s):
+Structure Optimisation of Large Transition-Metal Complexes with Extended Tight-Binding Methods
+# Batch 21 (1 titles)
+Input: Structure Optimisation of Large Transition-Metal Complexes with Extended Tight-Binding Methods  
+Best match: Structure Optimisation of Large Transition-Metal Complexes with Extended Tight-Binding Methods (Bursch; Neugebauer; Grimme, Angew. Chem. Int. Ed., 2019)  
+Search Trail: Checked the Wiley Online Library article page for Supporting Information files, then searched for the “145 transition-metal complex benchmark set” on the Grimme group website and verified the dedicated TMG145 download page that explicitly provides geometries in `.xyz`.  
+Evidence: https://www.chemie.uni-bonn.de/grimme/de/software/tmg145/tmg145-tar.gz (TMG145 archive, “All input and optimized geometries in .XYZ”); Paper DOI: https://doi.org/10.1002/anie.201904021  
+Verdict: Yes [XYZ]
+
+Sending batch 22 with 1 title(s):
+Streamlining the automated discovery of porous organic cages
+# Batch 22 (1 titles)
+Input: Streamlining the automated discovery of porous organic cages  
+Best match: Streamlining the automated discovery of porous organic cages (Chem. Sci., 2024), DOI: 10.1039/D3SC06133G  
+Search Trail: Checked the RSC article landing page and its ESI entry, then followed the data links to Zenodo and the associated GitHub repository to verify presence of machine-readable structure files (SMILES/MOL).  
+Evidence: https://raw.githubusercontent.com/GreenawayLab/Streamlining-Automated-Discovery-POCs/main/HT_Cage_Assembly_Optimisation/precursors.json ; https://raw.githubusercontent.com/GreenawayLab/Streamlining-Automated-Discovery-POCs/main/HT_Cage_Assembly_Optimisation/README.md ; https://zenodo.org/records/10675206 (DOI: 10.5281/zenodo.10675206)  
+Verdict: Yes, SMILES/MOL
+
+Sending batch 23 with 1 title(s):
+The ECOTOXicology Knowledgebase: A Curated Database of Ecologically Relevant Toxicity Tests to Support Environmental Research and Risk Assessment
+# Batch 23 (1 titles)
+Input: The ECOTOXicology Knowledgebase: A Curated Database of Ecologically Relevant Toxicity Tests to Support Environmental Research and Risk Assessment  
+Best match: The ECOTOXicology Knowledgebase: A Curated Database of Ecologically Relevant Toxicity Tests to Support Environmental Research and Risk Assessment (Environ Toxicol Chem, 2022)  
+Search Trail: Checked the full-text PMC version for DOI `10.1002/etc.5324`, focusing on the “Data downloads”/availability text and linked Supporting Information files. Also checked the official ECOTOX site download section for bulk data export formats.  
+Evidence: `https://doi.org/10.1002/etc.5324` ; ECOTOX bulk download (pipe-delimited ASCII): `https://gaftp.epa.gov/ecotox/ecotox_ascii_12_11_2025.zip`  
+Verdict: No
+
+Sending batch 24 with 1 title(s):
+Directional Multiobjective Optimization of Metal Complexes at the Billion-Scale with the tmQMg-L Dataset and PL-MOGA Algorithm
+# Batch 24 (1 titles)
+
+
+Sending batch 25 with 1 title(s):
+Maximising the hydrogen evolution activity in organic photocatalysts by co-polymerisation
+# Batch 25 (1 titles)
+Input: Maximising the hydrogen evolution activity in organic photocatalysts by co-polymerisation
+Best match: Maximising the hydrogen evolution activity in organic photocatalysts by co-polymerisation
+Search Trail: Checked the RSC journal landing page for DOI `10.1039/C8TA04186E`, focusing on the “Supplementary files” section and the ESI availability note describing included file types.
+Evidence: https://www.rsc.org/suppdata/c8/ta/c8ta04186e/c8ta04186e2.zip (ESI ZIP); https://doi.org/10.1039/C8TA04186E
+Verdict: Yes [XYZ]
+
+Sending batch 26 with 1 title(s):
+Modelling and prediction of the thermal conductivity of ionic liquid using flaml as an automated machine learning approach
+# Batch 26 (1 titles)
+Input: Modelling and prediction of the thermal conductivity of ionic liquid using flaml as an automated machine learning approach  
+Best match: Modelling and prediction of the thermal conductivity of ionic liquid using flaml as an automated machine learning approach (Afinidad. Journal of Chemical Engineering Theoretical and Applied Chemistry, 2025; DOI: 10.55815/432728)  
+Search Trail: Checked the journal landing page on RACO for “Data availability”/supplementary-file links and attempted to open the hosted PDF download. Also searched the web for author-linked repositories (GitHub/Zenodo/Figshare) associated with this exact title/DOI.  
+Evidence: None found  
+Verdict: No
+
+Sending batch 27 with 1 title(s):
+Directly optimizing for synthesizability in generative molecular design using retrosynthesis models
+^T# Batch 27 (1 titles)
+Input: Directly optimizing for synthesizability in generative molecular design using retrosynthesis models  
+Best match: Directly optimizing for synthesizability in generative molecular design using retrosynthesis models  
+Search Trail: Checked the open-access full text on PMC for the “Data availability” statement (DOI: 10.1039/D5SC01476J), followed the linked Saturn GitHub repository, and looked for downloadable structure-containing files (CSV/SMILES). Verified the presence of a SMILES-bearing dataset file in the repo (`oracle_history.csv` includes a `smiles` column).  
+Evidence: https://doi.org/10.1039/D5SC01476J ; https://github.com/schwallergroup/saturn/raw/refs/heads/master/experimental_reproduction/part_1/example-output-files/oracle_history.csv  
+Verdict: Yes, SMILES
+
+Sending batch 28 with 1 title(s):
+The quantum trajectory sensing problem and its solution
+# Batch 28 (1 titles)
+Input: The quantum trajectory sensing problem and its solution  
+Best match: The quantum trajectory sensing problem and its solution — Zachary E. Chin, Isaac L. Chuang (arXiv:2410.00893, 2024; DOI: 10.48550/arXiv.2410.00893)  
+Search Trail: Checked the arXiv record (including the “Code, Data and Media Associated with this Article” section and linked resources) and scanned the full text via the ar5iv HTML rendering for any “data/code availability” statements or external repository links; also checked CatalyzeX/PapersWithCode-style aggregators and web search for a GitHub/Zenodo/Figshare dataset.  
+Evidence: None found  
+Verdict: No
+
+Sending batch 29 with 1 title(s):
+Organocatalyzed Carbocyclic Construction: (+)-Roseophilin (Flynn) and (+)-Galbulin (Hong)
+# Batch 29 (1 titles)
+Input: Organocatalyzed Carbocyclic Construction: (+)-Roseophilin (Flynn) and (+)-Galbulin (Hong)  
+Best match: Organocatalyzed Carbocyclic Construction: (+)-Roseophilin (Flynn) and (+)-Galbulin (Hong) (Organic Chemistry Highlights; Douglass F. Taber; Dec 10, 2012)  
+Search Trail: Checked the Organic Chemistry Portal “Highlights” page for any downloadable machine-readable structures/data (SMILES/InChI/3D files). Followed the linked primary articles (notably the Hong galbulin Chem. Commun. paper) to see whether the dataset is released there rather than in the highlight.  
+Evidence: https://www.organic-chemistry.org/Highlights/2012/10December.shtm  
+Verdict: No
+
+Sending batch 30 with 1 title(s):
+Pyrfume: A window to the world’s olfactory data
+# Batch 30 (1 titles)
+Input: Pyrfume: A window to the world’s olfactory data  
+Best match: Pyrfume: A window to the world’s olfactory data  
+Search Trail: Checked the Scientific Data (Nature) article for data release statements and file specifications (mentions `molecules.csv` containing SMILES). Then verified the public `pyrfume-data` GitHub archive and inspected an example `molecules.csv` file containing an `IsomericSMILES` column.  
+Evidence: DOI: 10.1038/s41597-024-04051-z; Repository: https://github.com/pyrfume/pyrfume-data (example file: https://raw.githubusercontent.com/pyrfume/pyrfume-data/main/sigma_2014/molecules.csv)  
+Verdict: Yes, SMILES
+
+Sending batch 31 with 1 title(s):
+Pyrfume: A window to the world’s olfactory data
+# Batch 31 (1 titles)
+Input: Pyrfume: A window to the world’s olfactory data  
+Best match: Pyrfume: A window to the world’s olfactory data (Scientific Data, 2024; DOI: 10.1038/s41597-024-04051-z)  
+Search Trail: Checked the paper’s “Data Records” section on PMC (PMC11557823) for an explicit dataset deposition/ID, then inspected the linked `pyrfume-data` repository README and opened example `molecules.csv` files to confirm presence of SMILES strings.  
+Evidence: https://doi.org/10.5281/zenodo.13820408 ; https://github.com/pyrfume/pyrfume-data  
+Verdict: Yes, SMILES
+
+Sending batch 32 with 1 title(s):
+QeMFi: A Multifidelity Dataset of Quantum Chemical Properties of Diverse Molecules
+Batch 32 failed: timed out
+Skipping to next batch.
+
+Sending batch 33 with 1 title(s):
+Structure Activity Relationships in Cyclic Analogs of PAF with PAF Antagonist Properties
+# Batch 33 (1 titles)
+Input: Structure Activity Relationships in Cyclic Analogs of PAF with PAF Antagonist Properties  
+Best match: Structure Activity Relationships in Cyclic Analogs of PAF with PAF Antagonist Properties  
+Search Trail: Checked the Taylor & Francis/CRC Press chapter landing page for DOI `10.1201/9780429265921-7` and the parent book page (“Handbook of PAF and PAF Antagonists”) for any “Supplementary Materials”, dataset downloads, or repository links. Also searched the web for the chapter DOI/title combined with terms like “dataset”, “supporting information”, “SDF”, “SMILES”, “CIF”, and “GitHub/Figshare/Zenodo”.  
+Evidence: https://doi.org/10.1201/9780429265921-7  
+Verdict: No
