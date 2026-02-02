@@ -7,7 +7,7 @@ import httpx
 from opencode_ai import Opencode
 
 
-def send_message(message: str) -> str:
+def send_message(message: str, timeout: int) -> str:
     client = Opencode()
     config = client.config.get()
     model_ref = getattr(config, "model", None)
@@ -18,11 +18,12 @@ def send_message(message: str) -> str:
     session_resp = client._client.post(
         "/session",
         json={},
-        timeout=httpx.Timeout(60.0),
+        timeout=httpx.Timeout(15.0),
         headers={"Content-Type": "application/json"},
     )
     session_resp.raise_for_status()
     session_id = session_resp.json()["id"]
+    agent = "dataset-verification"  # 24 max steps, only websearch + crawlfetch
 
     payload: dict[str, Any] = {
         "messageID": f"msg_{uuid4().hex}",
@@ -36,15 +37,20 @@ def send_message(message: str) -> str:
                 "text": message,
             }
         ],
+        "agent": agent,
     }
 
-    response = client._client.post(
-        f"/session/{session_id}/message",
-        json=payload,
-        timeout=httpx.Timeout(180.0),
-        headers={"Content-Type": "application/json"},
-    )
-    response.raise_for_status()
+    try:
+        response = client._client.post(
+            f"/session/{session_id}/message",
+            json=payload,
+            timeout=httpx.Timeout(timeout),
+            headers={"Content-Type": "application/json"},
+        )
+        response.raise_for_status()
+    except httpx.TimeoutException:
+        abort_session(client, session_id)
+        raise
     body = response.json()
     return extract_text(body)
 
@@ -54,3 +60,13 @@ def extract_text(data: dict[str, Any]) -> str:
         if isinstance(part, dict) and part.get("type") == "text":
             return part.get("text")
     return ""
+
+
+def abort_session(client: Opencode, session_id: str) -> None:
+    response = client._client.post(
+        f"/session/{session_id}/abort",
+        json={},
+        timeout=httpx.Timeout(10.0),
+        headers={"Content-Type": "application/json"},
+    )
+    response.raise_for_status()
