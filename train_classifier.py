@@ -12,7 +12,7 @@ from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           BitsAndBytesConfig, DataCollatorWithPadding, Trainer,
                           TrainingArguments, set_seed)
 
-from utils.train_val_test_split import create_train_val_test_split
+from utils.data_loader import load_train_val_test
 from utils.visual_helper import visualize_predictions
 
 PROMPT_TEMPLATE = (
@@ -24,7 +24,7 @@ PROMPT_TEMPLATE = (
 Start new training
 
 PYTHONPATH=. python train_classifier.py \
-  --outdir outputs/classifier_512_v4 \
+  --outdir outputs/classifier_512_vXXX \
 
 Continue training
 
@@ -52,37 +52,22 @@ def prepare_dataset(samples: list[dict]) -> Dataset:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--outdir", default="outputs/classifier_512")
+    parser.add_argument("--outdir")
     parser.add_argument("--model_name", default="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
-    parser.add_argument(
-        "--resume_from",
-        default=None,
-        help="Path to existing adapter weights to continue training from.",
-    )
-    parser.add_argument(
-        "--resume_checkpoint",
-        default=None,
-        help="Trainer checkpoint directory to resume optimizer/scheduler state.",
-    )
+    parser.add_argument("--resume_from")
+    parser.add_argument("--resume_checkpoint")
     parser.add_argument("--max_length", type=int, default=512)
-    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--epochs", type=int, default=1)
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--lr", type=float, default=3e-5)
-    parser.add_argument("--val_pos", type=int, default=10)
-    parser.add_argument("--val_neg", type=int, default=40)
-    parser.add_argument("--test_pos", type=int, default=10)
-    parser.add_argument("--test_neg", type=int, default=40)
+    parser.add_argument("--val_pos", type=int, default=25)
+    parser.add_argument("--val_neg", type=int, default=25)
     parser.add_argument("--seed", type=int, default=1234)
     args = parser.parse_args()
-
+    
     os.makedirs(args.outdir, exist_ok=True)
-
     set_seed(args.seed)
-    random.seed(args.seed)
-
-    train_set, val_set, test_set = create_train_val_test_split(
-        args.val_pos, args.val_neg, args.test_pos, args.test_neg
-    )
+    train_set, val_set, test_set = load_train_val_test(args.val_pos, args.val_neg)
 
     dataset = DatasetDict(
         train=prepare_dataset(train_set),
@@ -104,7 +89,7 @@ def main():
 
     base_model: torch.nn.Module = AutoModelForSequenceClassification.from_pretrained(
         args.model_name,
-        num_labels=2,
+        num_labels=2,  # softmax
         quantization_config=BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_use_double_quant=True,
@@ -134,20 +119,6 @@ def main():
     else:
         model = get_peft_model(base_model, lora_cfg)
         print("LoRA adapters active")
-
-    """
-    # print number of trainable parameters
-
-    trainable, total = 0, 0
-    for _, param in model.named_parameters():
-        total += param.numel()
-        if param.requires_grad:
-            trainable += param.numel()
-    print(
-        f"Trainable params: {trainable:,} / {total:,} "
-        f"({100 * trainable / total:.2f}%)"
-    )
-    """
 
     training_args = TrainingArguments(
         output_dir=args.outdir,
