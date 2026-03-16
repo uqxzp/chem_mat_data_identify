@@ -21,6 +21,8 @@
   "modules_to_save": [
     "score",
     "classifier",
+    "score",
+    "classifier",
     "score"
   ],
   "peft_type": "LORA",
@@ -29,10 +31,10 @@
   "rank_pattern": {},
   "revision": null,
   "target_modules": [
-    "v_proj",
     "o_proj",
-    "q_proj",
-    "k_proj"
+    "k_proj",
+    "v_proj",
+    "q_proj"
   ],
   "target_parameters": null,
   "task_type": "SEQ_CLS",
