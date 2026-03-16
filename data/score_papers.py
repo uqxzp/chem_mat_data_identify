@@ -14,11 +14,12 @@ from train_classifier import PROMPT_TEMPLATE
 from utils.visual_helper import visualize_predictions
 
 """
-PYTHONPATH=. python data/scripts/score_samples.py \
-  --model_dir outputs/classifier_512_v4 \
-  --jsonl data/production/unlabeled_openalex.jsonl \
-  --output_all data/production/scored_all.jsonl \
-  --output_flagged data/production/scored_flagged.jsonl \
+PYTHONPATH=. python data/score_papers.py \
+  --model_dir outputs/classifier_512_tinyllama \
+  --jsonl data/unlabeled_openalex.jsonl \
+  --output_all data/unlabeled_scored.jsonl \
+  --output_flagged data/unlabeled_scored_flagged.jsonl \
+  --threshold 0.1
 """
 
 LOAD_KWARGS = {
@@ -101,7 +102,7 @@ def main():
     parser.add_argument(
         "--output_flagged", type=Path, default=Path("data/scored_flagged.jsonl")
     )
-    parser.add_argument("--threshold", type=float, default=0.05)
+    parser.add_argument("--threshold", type=float, default=0.1)
     parser.add_argument("--max_length", type=int, default=512)
     parser.add_argument("--print_real_time", type=bool, default=True)
     parser.add_argument(
@@ -129,6 +130,7 @@ def main():
         args.output_all.open("w", encoding="utf-8") as all_f,
         args.output_flagged.open("w", encoding="utf-8") as flagged_f,
     ):
+        i = 0
         for sample in iter_jsonl(args.jsonl):
             score = predict_score(
                 model,
@@ -138,15 +140,23 @@ def main():
                 args.max_length,
             )
             title = sample.get("title")
-            record = {"prediction": float(score), "title": title}
+            label = 1 if i < 50 else 0
+            record = {"prediction": float(score), "title": title, "label": label}
             all_f.write(json.dumps(record, ensure_ascii=False) + "\n")
+            # print positive outliers
+            '''
+            if score < args.threshold and label == 1:
+                progress.write(f"{score}: {title}")
+            '''
             if score > args.threshold:
                 flagged_f.write(json.dumps(record, ensure_ascii=False) + "\n")
                 number_flagged += 1
                 if args.print_real_time:
                     # Use tqdm's write to keep the progress bar in place while logging flagged titles.
                     progress.write(f"{number_flagged}: {title}")
+            
             progress.update(1)
+            i += 1
 
     progress.close()
     print(f"Flagged {number_flagged} samples above threshold {args.threshold}.")
