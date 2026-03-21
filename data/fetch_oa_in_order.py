@@ -14,16 +14,8 @@ DEFAULT_FILTERS = [
 
 SELECT_FIELDS = "id,title,abstract_inverted_index,publication_year"
 
-CURSOR: Path = Path("data/production/unlabeled_openalex.cursor")
-SEEN_IDS: Path = Path("data/production/unlabeled_openalex.ids")
-
-"""
-PYTHONPATH=. python data/production/fetch_oa_in_order.py \
-    --outfile data/production/unlabeled_openalex.jsonl \
-    --limit 5000 \
-    --year_lower_bound 2010
-"""
-
+CURSOR: Path = Path("data/unlabeled_openalex.cursor")
+SEEN_IDS: Path = Path("data/unlabeled_openalex.ids")
 
 def load_seen_ids(path: Path) -> set[str]:
     ids: set[str] = set()
