@@ -1,6 +1,6 @@
 A binary classifier using TinyLlama + QLoRA for identifying scientific publications that likely release new molecular datasets based on their titles and abstracts.
 
-Used opencode config file for the LLM-based verification step:
+Used opencode config agent for the LLM-based verification step:
 ```
 "agent": {
     "dataset-verification": {
