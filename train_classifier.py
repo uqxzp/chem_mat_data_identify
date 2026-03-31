@@ -5,14 +5,18 @@ PYTHONPATH=. python train_classifier.py \
   --outdir outputs/classifier_512_vXXX
 
 Resume training from saved LoRA adapters and a trainer checkpoint:
+- Set epochs to total number of epochs, not just additional ones.
+- Adjust learning rate if necessary.
 
 PYTHONPATH=. python train_classifier.py \
   --model_name TinyLlama/TinyLlama-1.1B-Chat-v1.0 \
-  --outdir outputs/classifier_512 \
-  --resume_from outputs/classifier_512 \
-  --resume_checkpoint outputs/classifier_512/checkpoint-XXXX
+  --outdir outputs/classifier_512_vXXX \
+  --resume_from outputs/classifier_512_vYYY \
+  --resume_checkpoint outputs/classifier_512_vYYY/checkpoint-ZZZZ
 
-Note: Training hyperparameters (e.g. epochs, learning rate, ...) are defined as constants in this script.
+Notes:
+- Hyperparameters are defined as constants in this script.
+- Replace placeholders in the example commands.
 """
 
 import argparse
