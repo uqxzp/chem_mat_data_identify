@@ -1,7 +1,23 @@
+"""
+Start a new training run:
+
+PYTHONPATH=. python train_classifier.py \
+  --outdir outputs/classifier_512_vXXX
+
+Resume training from saved LoRA adapters and a trainer checkpoint:
+
+PYTHONPATH=. python train_classifier.py \
+  --model_name TinyLlama/TinyLlama-1.1B-Chat-v1.0 \
+  --outdir outputs/classifier_512 \
+  --resume_from outputs/classifier_512 \
+  --resume_checkpoint outputs/classifier_512/checkpoint-XXXX
+
+Note: Training hyperparameters (e.g. epochs, learning rate, ...) are defined as constants in this script.
+"""
+
 import argparse
 import json
 import os
-import random
 
 import evaluate
 import numpy as np
@@ -15,59 +31,55 @@ from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
 from utils.data_loader import load_train_val_test
 from utils.visual_helper import visualize_predictions
 
-PROMPT_TEMPLATE = (
-    "You are a classifier. Decide if the following paper releases a dataset.\n"
-    "Title: {title}\n\nAbstract: {abstract}\nAnswer:"
-)
+# Training hyperparameters
+MAX_TOKENS = 512
+TRAINING_EPOCHS = 8
+TRAINING_BATCH_SIZE = 1
+TRAINING_LR = 3e-5
+TRAINING_VAL_POS = 25
+TRAINING_VAL_NEG = 25
+TRAINING_SEED = 1234
+TRAINING_GRAD_ACC = 4
+TRAINING_LOGGING_STEPS = 50
 
-"""
-Start new training
+# QLoRA
+LORA_RANK = 8
+LORA_ALPHA = 16
+LORA_DROPOUT = 0.05
 
-PYTHONPATH=. python train_classifier.py \
-  --outdir outputs/classifier_512_vXXX \
-
-Continue training
-
-PYTHONPATH=. python train_classifier.py \
-  --model_name TinyLlama/TinyLlama-1.1B-Chat-v1.0 \
-  --outdir outputs/classifier_512 \
-  --resume_from outputs/classifier_512 \
-  --resume_checkpoint outputs/classifier_512/checkpoint-XXXX \
-  --epochs 10   # Total, not additional epochs
-"""
+PROMPT_TEMPLATE = """You are a classifier. Decide if the following paper releases a dataset.
+Title: {title}
+Abstract: {abstract}
+Answer:"""
 
 
 def prepare_dataset(samples: list[dict]) -> Dataset:
     ds = Dataset.from_list(samples)
-    return ds.map(
-        lambda s: {
-            "text": PROMPT_TEMPLATE.format(
-                title=s.get("title"), abstract=s.get("abstract", "")
-            ),
-            "label": s.get("label"),
-        },
-        remove_columns=ds.column_names,
-    )
+
+    def transform(s: dict) -> dict:
+        return {
+            "text": PROMPT_TEMPLATE.format(title=s["title"], abstract=s["abstract"]),
+            "label": s["label"],
+        }
+
+    return ds.map(transform, remove_columns=ds.column_names)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--outdir")
+    parser.add_argument(
+        "--outdir", required=True, help="Output directory of the fine-tuned model."
+    )
     parser.add_argument("--model_name", default="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
     parser.add_argument("--resume_from")
     parser.add_argument("--resume_checkpoint")
-    parser.add_argument("--max_length", type=int, default=512)
-    parser.add_argument("--epochs", type=int, default=1)
-    parser.add_argument("--batch_size", type=int, default=1)
-    parser.add_argument("--lr", type=float, default=3e-5)
-    parser.add_argument("--val_pos", type=int, default=25)
-    parser.add_argument("--val_neg", type=int, default=25)
-    parser.add_argument("--seed", type=int, default=1234)
     args = parser.parse_args()
-    
+
     os.makedirs(args.outdir, exist_ok=True)
-    set_seed(args.seed)
-    train_set, val_set, test_set = load_train_val_test(args.val_pos, args.val_neg)
+    set_seed(TRAINING_SEED)
+    train_set, val_set, test_set = load_train_val_test(
+        TRAINING_VAL_POS, TRAINING_VAL_NEG
+    )
 
     dataset = DatasetDict(
         train=prepare_dataset(train_set),
@@ -80,16 +92,14 @@ def main():
         tokenizer.pad_token = tokenizer.eos_token
 
     tokenized = dataset.map(
-        lambda batch: tokenizer(
-            batch["text"], truncation=True, max_length=args.max_length
-        ),
+        lambda batch: tokenizer(batch["text"], truncation=True, max_length=MAX_TOKENS),
         batched=True,
         remove_columns=["text"],
     )
 
     base_model: torch.nn.Module = AutoModelForSequenceClassification.from_pretrained(
         args.model_name,
-        num_labels=2,  # softmax
+        num_labels=2,
         quantization_config=BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_use_double_quant=True,
@@ -104,9 +114,9 @@ def main():
 
     lora_cfg = LoraConfig(
         task_type=TaskType.SEQ_CLS,
-        r=8,
-        lora_alpha=16,
-        lora_dropout=0.05,
+        r=LORA_RANK,
+        lora_alpha=LORA_ALPHA,
+        lora_dropout=LORA_DROPOUT,
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
         bias="none",
         modules_to_save=["score"],
@@ -122,24 +132,23 @@ def main():
 
     training_args = TrainingArguments(
         output_dir=args.outdir,
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size,
-        learning_rate=args.lr,
-        num_train_epochs=args.epochs,
-        gradient_accumulation_steps=4,
+        per_device_train_batch_size=TRAINING_BATCH_SIZE,
+        per_device_eval_batch_size=TRAINING_BATCH_SIZE,
+        learning_rate=TRAINING_LR,
+        num_train_epochs=TRAINING_EPOCHS,
+        gradient_accumulation_steps=TRAINING_GRAD_ACC,
         eval_strategy="epoch",
         save_strategy="epoch",
-        logging_steps=50,
-        report_to="none",
+        logging_steps=TRAINING_LOGGING_STEPS,
         lr_scheduler_type="cosine",
     )
 
     accuracy_metric = evaluate.load("accuracy")
 
     def compute_metrics(eval_pred):
-        preds = np.argmax(eval_pred.predictions, axis=-1)
+        class_preds = np.argmax(eval_pred.predictions, axis=-1)
         return accuracy_metric.compute(
-            predictions=preds, references=eval_pred.label_ids
+            predictions=class_preds, references=eval_pred.label_ids
         )
 
     trainer = Trainer(
@@ -156,16 +165,16 @@ def main():
     metrics = trainer.evaluate()
 
     predictions = trainer.predict(tokenized["test"])
-    probs = torch.softmax(torch.from_numpy(predictions.predictions), dim=-1)[:, 1]
+    preds = torch.softmax(torch.from_numpy(predictions.predictions), dim=-1)[:, 1]
     pred_path = os.path.join(args.outdir, "test_predictions.jsonl")
     with open(pred_path, "w", encoding="utf-8") as f:
-        for row, prob in zip(test_set, probs.tolist()):
+        for row, pred in zip(test_set, preds.tolist()):
             f.write(
                 json.dumps(
                     {
-                        "label": row.get("label"),
-                        "prediction": prob,
-                        "title": row.get("title"),
+                        "label": row["label"],
+                        "prediction": pred,
+                        "title": row["title"],
                     },
                     ensure_ascii=False,
                 )

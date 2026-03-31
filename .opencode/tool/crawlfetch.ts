@@ -143,7 +143,7 @@ export default tool({
     const host = getHost(url);
     const prevBlocks = host ? (blockedHosts.get(host) ?? 0) : 0;
 
-    // HARD GUARD: don't keep retrying a host that already blocked us
+    // Don't retry host that already blocked the agent
     if (host && prevBlocks >= 1) {
       return [
         `# CrawlFetch result`,
@@ -171,7 +171,7 @@ export default tool({
       ].filter(Boolean).join("\n");
     }
 
-    // Detect Cloudflare/CAPTCHA/etc.
+    // Detect human verification
     const block = detectHumanVerification(mdFull);
     if (block.blocked) {
       if (host) blockedHosts.set(host, prevBlocks + 1);
@@ -189,7 +189,7 @@ export default tool({
       ].filter(Boolean).join("\n");
     }
 
-    // Normal behavior (your original logic)
+    // Normal behavior
     const urls = extractUrls(mdFull);
     const ranked = urls
       .map(u => ({ u, score: scoreUrl(u) }))
