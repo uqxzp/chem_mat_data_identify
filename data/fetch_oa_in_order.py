@@ -1,3 +1,19 @@
+"""
+Fetch titles and abstracts of chemistry and materials science papers from OpenAlex 
+and write them to a JSONL file.
+
+The script filters works by year, reconstructs abstracts, and stores records
+incrementally while saving seen IDs and the cursor for resuming later runs.
+
+Example usage:
+
+PYTHONPATH=. python data/fetch_oa_in_order.py \
+    --limit 1000 \
+    --year_lower_bound 2010
+
+Note: Existing output files are not overwritten. New records are appended to the end.
+"""
+
 import argparse
 import json
 from pathlib import Path
@@ -16,6 +32,7 @@ SELECT_FIELDS = "id,title,abstract_inverted_index,publication_year"
 
 CURSOR: Path = Path("data/unlabeled_openalex.cursor")
 SEEN_IDS: Path = Path("data/unlabeled_openalex.ids")
+
 
 def load_seen_ids(path: Path) -> set[str]:
     ids: set[str] = set()
@@ -53,14 +70,26 @@ def to_record(obj: dict) -> dict:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--outfile", type=Path, default=Path("data/unlabeled_openalex.jsonl"))
-    parser.add_argument("--limit", type=int, default=1000)
-    parser.add_argument("--year_lower_bound", type=int, default=2010)
+    parser.add_argument(
+        "--outfile",
+        type=Path,
+        default=Path(
+            "data/unlabeled_openalex.jsonl", help="Path to the output JSONL file."
+        ),
+    )
+    parser.add_argument(
+        "--limit", type=int, default=1000, help="Maximum number of records to write."
+    )
+    parser.add_argument(
+        "--year_lower_bound",
+        type=int,
+        default=2010,
+        help="Only include works published from this year onward.",
+    )
     args = parser.parse_args()
 
     if args.limit <= 0:
-        print("Invalid limit")
-        return
+        parser.error("--limit must be greater than 0")
 
     filters = make_filters(args.year_lower_bound)
     seen_ids = load_seen_ids(SEEN_IDS)
