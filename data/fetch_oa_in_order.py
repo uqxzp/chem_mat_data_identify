@@ -35,15 +35,11 @@ SEEN_IDS: Path = Path("data/unlabeled_openalex.ids")
 
 
 def load_seen_ids(path: Path) -> set[str]:
-    ids: set[str] = set()
     if not path.exists():
-        return ids
-    with path.open("r", encoding="utf-8") as fh:
-        for line in fh:
-            line = line.strip()
-            if line:
-                ids.add(line)
-    return ids
+        return set()
+
+    with path.open(encoding="utf-8") as f:
+        return {line.strip() for line in f if line.strip()}
 
 
 def write_cursor(path: Path, cursor: str | None):
