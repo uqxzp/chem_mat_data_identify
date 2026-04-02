@@ -100,7 +100,6 @@ def sort_jsonl(path: Path):
 
 def main():
     parser = argparse.ArgumentParser()
-
     parser.add_argument(
         "--model_dir",
         required=True,
