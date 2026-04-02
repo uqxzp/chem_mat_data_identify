@@ -1,7 +1,24 @@
+"""
+Score papers from a JSONL file with a fine-tuned classifier.
+
+The script loads the model from `--model_dir`, predicts a score for each paper
+from its title and abstract, writes all results to `--output_all`, and writes
+papers above the threshold to `--output_flagged`.
+
+Example:
+    PYTHONPATH=. python data/score_papers.py \
+      --jsonl data/test_set.jsonl \
+      --model_dir outputs/classifier_512_tinyllama \
+      --output_all data/test_set_all.jsonl \
+      --output_flagged data/test_set_flagged.jsonl \
+      --threshold 0.05
+
+Note: threshold 0.05 achieved the best test set performance (46/50 pos. and 50/50 neg.)
+"""
+
 import argparse
 import json
 import os
-import subprocess
 from pathlib import Path
 
 import torch
@@ -12,15 +29,6 @@ from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
 
 from train_classifier import PROMPT_TEMPLATE
 from utils.visual_helper import visualize_predictions
-
-"""
-PYTHONPATH=. python data/score_papers.py \
-  --model_dir outputs/classifier_512_tinyllama \
-  --jsonl data/unlabeled_openalex.jsonl \
-  --output_all data/unlabeled_scored.jsonl \
-  --output_flagged data/unlabeled_scored_flagged.jsonl \
-  --threshold 0.1
-"""
 
 LOAD_KWARGS = {
     "device_map": "auto",
@@ -34,21 +42,19 @@ LOAD_KWARGS = {
 
 
 def load_model(model_dir: str):
-    adapter_cfg = os.path.join(model_dir, "adapter_config.json")
+    adapter_cfg = Path(model_dir) / "adapter_config.json"
+    if not os.path.exists(adapter_cfg):
+        raise FileNotFoundError("Model directory not found.")
 
-    if os.path.exists(adapter_cfg):
-        with open(adapter_cfg, "r", encoding="utf-8") as fh:
-            base_ckpt = json.load(fh).get("base_model_name_or_path")
-        if not base_ckpt:
-            raise RuntimeError("adapter_config.json missing `base_model_name_or_path`.")
-        base_model = AutoModelForSequenceClassification.from_pretrained(
-            base_ckpt, num_labels=2, **LOAD_KWARGS
-        )
-        return PeftModel.from_pretrained(base_model, model_dir, is_trainable=False)
+    with adapter_cfg.open(encoding="utf-8") as f:
+        base_ckpt = json.load(f).get("base_model_name_or_path")
+    if not base_ckpt:
+        raise RuntimeError("adapter_config.json missing `base_model_name_or_path`.")
 
-    return AutoModelForSequenceClassification.from_pretrained(
-        model_dir, num_labels=2, **LOAD_KWARGS
+    base_model = AutoModelForSequenceClassification.from_pretrained(
+        base_ckpt, num_labels=2, **LOAD_KWARGS
     )
+    return PeftModel.from_pretrained(base_model, model_dir, is_trainable=False)
 
 
 def predict_score(
@@ -82,33 +88,59 @@ def iter_jsonl(path: Path):
 
 
 def sort_jsonl(path: Path):
-    with open(path, encoding="utf-8") as f:
+    with path.open(encoding="utf-8") as f:
         records = [json.loads(line) for line in f if line.strip()]
 
     records.sort(key=lambda x: x["prediction"], reverse=True)
 
-    with open(path, "w", encoding="utf-8") as f:
+    with path.open("w", encoding="utf-8") as f:
         for r in records:
             f.write(json.dumps(r) + "\n")
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_dir", required=True)
-    parser.add_argument("--jsonl", required=True, type=Path)
+
     parser.add_argument(
-        "--output_all", type=Path, default=Path("data/scored_all.jsonl")
+        "--model_dir",
+        required=True,
+        help="Directory containing the fine-tuned model.",
     )
     parser.add_argument(
-        "--output_flagged", type=Path, default=Path("data/scored_flagged.jsonl")
+        "--jsonl",
+        required=True,
+        type=Path,
+        help="Input JSONL file with papers to score.",
     )
-    parser.add_argument("--threshold", type=float, default=0.1)
-    parser.add_argument("--max_length", type=int, default=512)
-    parser.add_argument("--print_real_time", type=bool, default=True)
     parser.add_argument(
-        "--verify",
-        action="store_true",
-        help="run dataset_verification.py on flagged samples",
+        "--output_all",
+        type=Path,
+        default=Path("data/scored_all.jsonl"),
+        help="Output JSONL file for all scored papers.",
+    )
+    parser.add_argument(
+        "--output_flagged",
+        type=Path,
+        default=Path("data/scored_flagged.jsonl"),
+        help="Output JSONL file for papers above the threshold.",
+    )
+    parser.add_argument(
+        "--threshold",
+        type=float,
+        default=0.1,
+        help="Score threshold for flagged papers.",
+    )
+    parser.add_argument(
+        "--max_length",
+        type=int,
+        default=512,
+        help="Maximum tokenized input length.",
+    )
+    parser.add_argument(
+        "--print_real_time",
+        type=bool,
+        default=True,
+        help="Print flagged titles during scoring.",
     )
     args = parser.parse_args()
 
@@ -124,7 +156,7 @@ def main():
     args.output_flagged.parent.mkdir(parents=True, exist_ok=True)
     number_flagged = 0
     total = sum(1 for _ in open(args.jsonl, "rb"))
-    progress = tqdm(total=total, desc="Scanning jsonl", unit="sample")
+    progress = tqdm(total=total, desc="Progress", unit="paper")
 
     with (
         args.output_all.open("w", encoding="utf-8") as all_f,
@@ -135,26 +167,21 @@ def main():
             score = predict_score(
                 model,
                 tokenizer,
-                sample.get("title"),
-                sample.get("abstract"),
+                sample["title"],
+                sample["abstract"],
                 args.max_length,
             )
-            title = sample.get("title")
+            title = sample["title"]
             label = 1 if i < 50 else 0
             record = {"prediction": float(score), "title": title, "label": label}
             all_f.write(json.dumps(record, ensure_ascii=False) + "\n")
-            # print positive outliers
-            '''
-            if score < args.threshold and label == 1:
-                progress.write(f"{score}: {title}")
-            '''
             if score > args.threshold:
                 flagged_f.write(json.dumps(record, ensure_ascii=False) + "\n")
                 number_flagged += 1
                 if args.print_real_time:
-                    # Use tqdm's write to keep the progress bar in place while logging flagged titles.
+                    # Keeps progress bar in place while printing flagged titles
                     progress.write(f"{number_flagged}: {title}")
-            
+
             progress.update(1)
             i += 1
 
@@ -163,14 +190,6 @@ def main():
 
     sort_jsonl(args.output_flagged)
     visualize_predictions(args.output_all)
-
-    if args.verify:
-        repo_root = Path(__file__).resolve().parent.parent
-        subprocess.run(
-            ["python", "opencode/dataset_verification.py"],
-            check=True,
-            cwd=repo_root,
-        )
 
 
 if __name__ == "__main__":

@@ -5,11 +5,10 @@ and write them to a JSONL file.
 The script filters works by year, reconstructs abstracts, and stores records
 incrementally while saving seen IDs and the cursor for resuming later runs.
 
-Example usage:
-
-PYTHONPATH=. python data/fetch_oa_in_order.py \
-    --limit 1000 \
-    --year_lower_bound 2010
+Example:
+    PYTHONPATH=. python data/fetch_oa_in_order.py \
+      --limit 1000 \
+      --year_lower_bound 2010
 
 Note: Existing output files are not overwritten. New records are appended to the end.
 """
