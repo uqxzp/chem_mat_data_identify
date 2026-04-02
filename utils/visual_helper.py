@@ -1,3 +1,4 @@
+"""Helper for visualizing the predictions from the SLM classifier."""
 import argparse
 
 import matplotlib.pyplot as plt

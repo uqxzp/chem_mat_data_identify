@@ -1,3 +1,4 @@
+"""Helper functions for fetching from OpenAlex."""
 from __future__ import annotations
 
 import time
