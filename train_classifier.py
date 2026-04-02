@@ -24,15 +24,22 @@ Notes:
 import argparse
 import json
 import os
+from pathlib import Path
 
 import evaluate
 import numpy as np
 import torch
 from datasets import Dataset, DatasetDict
 from peft import LoraConfig, PeftModel, TaskType, get_peft_model
-from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
-                          BitsAndBytesConfig, DataCollatorWithPadding, Trainer,
-                          TrainingArguments, set_seed)
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    DataCollatorWithPadding,
+    Trainer,
+    TrainingArguments,
+    set_seed,
+)
 
 from utils.data_loader import load_train_val_test
 from utils.visual_helper import visualize_predictions
@@ -41,12 +48,13 @@ from utils.visual_helper import visualize_predictions
 MAX_TOKENS = 512
 TRAINING_EPOCHS = 8
 TRAINING_BATCH_SIZE = 1
-TRAINING_LR = 3e-5
+TRAINING_LR = 3e-5  # currently using cosine scheduler
 TRAINING_VAL_POS = 25
 TRAINING_VAL_NEG = 25
 TRAINING_SEED = 1234
 TRAINING_GRAD_ACC = 4
 TRAINING_LOGGING_STEPS = 50
+BASE_MODEL_TINYLLAMA = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
 # QLoRA
 LORA_RANK = 8
@@ -76,7 +84,7 @@ def main():
     parser.add_argument(
         "--outdir", required=True, help="Output directory of the fine-tuned model."
     )
-    parser.add_argument("--model_name", default="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+    parser.add_argument("--model_name", default=BASE_MODEL_TINYLLAMA)
     parser.add_argument("--resume_from")
     parser.add_argument("--resume_checkpoint")
     args = parser.parse_args()
@@ -172,7 +180,7 @@ def main():
 
     predictions = trainer.predict(tokenized["test"])
     preds = torch.softmax(torch.from_numpy(predictions.predictions), dim=-1)[:, 1]
-    pred_path = os.path.join(args.outdir, "test_predictions.jsonl")
+    pred_path = Path(args.outdir) / "test_predictions.json"
     with open(pred_path, "w", encoding="utf-8") as f:
         for row, pred in zip(test_set, preds.tolist()):
             f.write(
@@ -189,7 +197,7 @@ def main():
 
     trainer.save_model(args.outdir)
     tokenizer.save_pretrained(args.outdir)
-    with open(os.path.join(args.outdir, "metrics.json"), "w", encoding="utf-8") as f:
+    with open(Path(args.outdir) / "metrics.json", "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
 
     visualize_predictions(pred_path)

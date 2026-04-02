@@ -1,3 +1,9 @@
+"""
+Build random and hard negative samples for classifier training.
+
+Note: the output is intended as weak supervision and should be manually verified.
+"""
+
 import argparse
 import json
 import re
@@ -7,8 +13,6 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 from utils.fetch_openalex import (norm_str, search_hard_negatives_chem_and_mat,
                                   search_random_negatives_chem_and_mat)
-
-# Example usage: PYTHONPATH=. python data/scripts/build_negatives.py   --positives_jsonl data/positives.jsonl   --outfile data/negatives.jsonl
 
 YEAR_LOWER_BOUND = 2010
 
@@ -145,7 +149,6 @@ def main():
         if len(hard_negatives) >= args.hard_n:
             break
 
-    # write
     args.outfile.parent.mkdir(parents=True, exist_ok=True)
     with args.outfile.open("w", encoding="utf-8") as out:
         for line in random_negatives + hard_negatives:

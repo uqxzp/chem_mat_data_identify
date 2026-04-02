@@ -1,3 +1,4 @@
+"""Plot ROC and confusion-matrix figures from scored test-set JSONL data."""
 import argparse
 import json
 from pathlib import Path

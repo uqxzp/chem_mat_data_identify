@@ -33,4 +33,5 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-exclude = ["outputs", "data", "outputs.*", "data.*", "tests", "tests.*"]
+include = ["opencode*", "utils*"]
+exclude = ["tests", "tests.*"]
