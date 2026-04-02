@@ -10,7 +10,6 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 from utils.fetch_openalex import (norm_str, search_hard_negatives_chem_and_mat,
                                   search_random_negatives_chem_and_mat)
 

@@ -17,12 +17,6 @@ BASE_URL = "https://api.openalex.org/works"
 OA_BASE = "https://api.openalex.org"
 
 
-def session() -> Session:
-    s = Session()
-    s.headers.update({"User-Agent": "chem-mat-detector/0.1"})
-    return s
-
-
 def fetch(
     path: str, params: dict, tries: int = 3, timeout: int = 10
 ) -> Response | None:
@@ -105,7 +99,6 @@ def search_random_negatives_chem_and_mat(
     rndm = Random(seed)
     requested = 0
     seen_ids: set[str] = set()
-    attempts = 0
 
     while requested < sample_size:
         batch_size = min(max_batch, sample_size - requested)
@@ -119,15 +112,13 @@ def search_random_negatives_chem_and_mat(
         r = fetch("/works", params)
         if not r or r.status_code != 200:
             continue
-
-        added_this_round = 0
+        
         for obj in r.json().get("results", ()):
             oid = obj.get("id")
             if not oid or oid in seen_ids:
                 continue
             seen_ids.add(oid)
             requested += 1
-            added_this_round += 1
             yield to_min_record(obj)
             if requested >= sample_size:
                 return

@@ -23,6 +23,8 @@ dependencies = [
     "matplotlib>=3.8",
     "requests>=2.31",
     "urllib3>=2.0",
+    "httpx>=0.27",
+    "opencode-ai",
 ]
 
 [project.optional-dependencies]

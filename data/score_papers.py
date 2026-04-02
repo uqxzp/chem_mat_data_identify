@@ -135,12 +135,6 @@ def main():
         default=512,
         help="Maximum tokenized input length.",
     )
-    parser.add_argument(
-        "--print_real_time",
-        type=bool,
-        default=True,
-        help="Print flagged titles during scoring.",
-    )
     args = parser.parse_args()
 
     tokenizer = AutoTokenizer.from_pretrained(args.model_dir)
@@ -177,9 +171,8 @@ def main():
             if score > args.threshold:
                 flagged_f.write(json.dumps(record, ensure_ascii=False) + "\n")
                 number_flagged += 1
-                if args.print_real_time:
-                    # Keeps progress bar in place while printing flagged titles
-                    progress.write(f"{number_flagged}: {title}")
+                # Keeps progress bar in place while printing flagged titles
+                progress.write(f"{number_flagged}: {title}")
 
             progress.update(1)
             i += 1

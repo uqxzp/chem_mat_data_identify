@@ -66,19 +66,19 @@ Paper title:
 """
 
 
-def load_titles(path: Path) -> list[str]:
+def load_titles(path: Path):
     with open(path, encoding="utf-8") as f:
         records = [json.loads(line) for line in f]
     titles = [r["title"] for r in records]
     return titles
 
 
-def chunked(items: list[str], size: int) -> Iterable[list[str]]:
+def chunked(items: list[str], size: int):
     for idx in range(0, len(items), size):
         yield items[idx : idx + size]
 
 
-def build_prompt(titles: list[str]) -> str:
+def build_prompt(titles: list[str]):
     if len(titles) > 1:
         numbered_titles = "\n".join(
             f"{idx}. {title}" for idx, title in enumerate(titles, start=1)

@@ -68,9 +68,8 @@ def main():
     parser.add_argument(
         "--outfile",
         type=Path,
-        default=Path(
-            "data/unlabeled_openalex.jsonl", help="Path to the output JSONL file."
-        ),
+        default=Path("data/unlabeled_openalex.jsonl"),
+        help="Path to the output JSONL file.",
     )
     parser.add_argument(
         "--limit", type=int, default=1000, help="Maximum number of records to write."
